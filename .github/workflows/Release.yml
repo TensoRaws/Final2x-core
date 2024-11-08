@@ -16,11 +16,12 @@ jobs:
         id: get_date
         run: echo "DATE=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
 
-  Build:
+  build:
     strategy:
       matrix:
-        python-version: ["3.10"]
-        os-version: ["windows-latest", "ubuntu-20.04", "macos-13", "macos-14"]
+        os-version: ["windows-latest", "macos-13", "macos-14"]
+        python-version: ["3.11"]
+        poetry-version: ["1.8.3"]
 
     runs-on: ${{ matrix.os-version }}
     steps:
@@ -28,52 +29,107 @@ jobs:
         with:
           submodules: recursive
 
-      - uses: pdm-project/setup-pdm@v4
-        name: Setup PDM
+      - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-        continue-on-error: true
 
-      - name: vulkan dll
+      - uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: ${{ matrix.poetry-version }}
+
+      - name: Install dependencies
+        run: |
+          pip install numpy==1.26.4
+          pip install PyYAML pydantic ccrestoration loguru
+          pip install pre-commit scikit-image
+          pip install pytest pytest-cov coverage
+          pip install mypy ruff
+
+      - name: Install PyTorch 2.2.2 with CUDA
         if: matrix.os-version == 'windows-latest'
-        run: echo F | xcopy .\assets\vulkan-1.dll C:\Windows\System32
+        run: |
+          pip install torch==2.2.2 torchvision==0.17.2 torchaudio==2.2.2 --index-url https://download.pytorch.org/whl/cu121
+
+      - name: Install PyTorch 2.2.2
+        if: matrix.os-version != 'windows-latest'
+        run: |
+          pip install torch==2.2.2 torchvision==0.17.2 torchaudio==2.2.2
 
       - name: Build
         run: |
-          pdm install
-          pdm run pyinstaller
+          pip install pyinstaller~=6.3.0
+          make gen
+          make pyinstaller
 
       - name: zip-windows
         if: matrix.os-version == 'windows-latest'
         run: |
           cd dist\Final2x-core
-          7z a -r Final2x-core-${{ matrix.os-version }}.zip *
-
-      - name: zip-linux
-        if: matrix.os-version == 'ubuntu-20.04'
-        run: |
-          cd dist/Final2x-core
-          zip -9 -r Final2x-core-${{ matrix.os-version }}.zip ./*
+          7z a -r Final2x-core-${{ matrix.os-version }}.7z *
 
       - name: zip-macos-x64
         if: matrix.os-version == 'macos-13'
         run: |
           cd dist/Final2x-core
-          zip -9 -r Final2x-core-macos-x64.zip ./*
+          7z a -r Final2x-core-macos-x64.7z *
 
       - name: zip-macos-arm64
         if: matrix.os-version == 'macos-14'
         run: |
           cd dist/Final2x-core
-          zip -9 -r Final2x-core-macos-arm64.zip ./*
+          7z a -r Final2x-core-macos-arm64.7z *
 
       - name: upload
         uses: actions/upload-artifact@v3
         with:
-          path: dist/Final2x-core/*.zip
+          path: dist/Final2x-core/*.7z
 
-  Release:
-    needs: [setup, build]
+  build-wheel:
+    strategy:
+      matrix:
+        python-version: ["3.11"]
+        poetry-version: ["1.8.3"]
+
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: ${{ matrix.poetry-version }}
+
+      - name: Build package
+        run: |
+          make build
+
+      - name: upload
+        uses: actions/upload-artifact@v3
+        with:
+          name: wheel
+          path: dist/*.whl
+
+  pypi:
+    needs: [build-wheel]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: wheel
+          path: dist
+
+  #      - name: Publish a Python distribution to PyPI
+  #        uses: pypa/gh-action-pypi-publish@release/v1
+  #        with:
+  #          password: ${{ secrets.PYPI_API }}
+
+  github:
+    needs: [setup, build, pypi]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v3
@@ -83,15 +139,13 @@ jobs:
       - name: dist
         run: |
           mkdir dist
+          tree asset
           cp asset/artifact/* dist
           cd dist && ls
 
       - name: Create Release and Upload Release Asset
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           name: Release ${{ needs.setup.outputs.DATE }}
           tag_name: ${{ needs.setup.outputs.DATE }}
-          body: Auto Release.
-          draft: false
-          prerelease: false
           files: dist/*

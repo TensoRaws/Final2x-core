@@ -1,32 +1,18 @@
-from tests.util import calculate_image_similarity, compare_image_size, getSRCONFIG, load_image
+from ccrestoration import ConfigType
+
+from Final2x_core import CCRestoration, SRConfig
+
+from .util import CONFIG_PATH, calculate_image_similarity, compare_image_size, load_image
 
 
 class Test_TARGETSCALE:
     def test_case_targetscale_positive(self) -> None:
-        from Final2x_core.src.SRFactory import REALCUGAN
-
-        config = getSRCONFIG()
-        config.model = "RealCUGAN-pro"  # type: ignore
-        for t in [7.99999, 1, 2, 2.5, 4, 5.6619, 8, 10]:
-            config.targetscale = t  # type: ignore
-            SR = REALCUGAN()
+        config: SRConfig = SRConfig.from_yaml(CONFIG_PATH)
+        config.pretrained_model_name = ConfigType.RealESRGAN_AnimeJaNai_HD_V3_Compact_2x
+        for t in [7.99999, 1, 2, 2.5, 4, 5.6619, 8, 0.673]:
+            config.target_scale = t
+            SR = CCRestoration(config=config)
             img1 = load_image()
             img2 = SR.process(img1)
             assert calculate_image_similarity(img1, img2)
-            assert compare_image_size(img1, img2, config.targetscale)
-
-    def test_case_targetscale_negative(self) -> None:
-        from Final2x_core.src.SRFactory import REALCUGAN
-
-        config = getSRCONFIG()
-        config.model = "RealCUGAN-se"  # type: ignore
-        for t in [0, 0.00, -114, -514.114, -1919810]:
-            config.targetscale = t  # type: ignore
-            SR = REALCUGAN()
-            img1 = load_image()
-            img2 = SR.process(img1)
-            assert calculate_image_similarity(img1, img2)
-            assert (
-                img2.shape[0] == img1.shape[0] * config.modelscale
-                and img2.shape[1] == img1.shape[1] * config.modelscale
-            )
+            assert compare_image_size(img1, img2, config.target_scale)

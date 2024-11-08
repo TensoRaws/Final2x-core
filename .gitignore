@@ -162,8 +162,6 @@ cython_debug/
 
 /.ruff_cache/
 
-/src/Final2x_core/models/Waifu2x/
-/src/Final2x_core/models/RealESRGAN/
-/src/Final2x_core/models/RealCUGAN/
 /assets/outputs/
-/src/Final2x_core/config.yaml
+
+/Final2x_core/config.yaml

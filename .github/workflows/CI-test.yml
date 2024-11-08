@@ -22,8 +22,9 @@ jobs:
   CI:
     strategy:
       matrix:
-        python-version: ["3.10"]
         os-version: ["windows-latest", "ubuntu-20.04", "macos-13", "macos-14"]
+        python-version: ["3.11"]
+        poetry-version: ["1.8.3"]
 
     runs-on: ${{ matrix.os-version }}
     steps:
@@ -31,23 +32,88 @@ jobs:
         with:
           submodules: recursive
 
-      - uses: pdm-project/setup-pdm@v4
-        name: Setup PDM
+      - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-        continue-on-error: true
 
-      - name: vulkan dll
+      - uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: ${{ matrix.poetry-version }}
+
+      - name: Install dependencies
+        run: |
+          pip install numpy==1.26.4
+          pip install PyYAML pydantic ccrestoration loguru
+          pip install pre-commit scikit-image
+          pip install pytest pytest-cov coverage
+          pip install mypy ruff
+
+      - name: Install PyTorch 2.2.2 with CUDA
         if: matrix.os-version == 'windows-latest'
-        run: echo F | xcopy .\assets\vulkan-1.dll C:\Windows\System32
+        run: |
+          pip install torch==2.2.2 torchvision==0.17.2 torchaudio==2.2.2 --index-url https://download.pytorch.org/whl/cu121
+
+      - name: Install PyTorch 2.2.2
+        if: matrix.os-version != 'windows-latest'
+        run: |
+          pip install torch==2.2.2 torchvision==0.17.2 torchaudio==2.2.2
 
       - name: Test
         run: |
-          pdm install
-          pdm run test
+          make gen
+          make lint
+          make test
 
       - name: Codecov
         if: matrix.os-version == 'ubuntu-20.04'
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Build
+        run: |
+          pip install pyinstaller~=6.3.0
+          make gen
+          make pyinstaller
+
+      - name: zip-windows
+        if: matrix.os-version == 'windows-latest'
+        run: |
+          cd dist\Final2x-core
+          7z a -r Final2x-core-${{ matrix.os-version }}.7z *
+
+      - name: zip-ubuntu
+        if: matrix.os-version == 'ubuntu-20.04'
+        run: |
+          cd dist/Final2x-core
+          7z a -r Final2x-core-${{ matrix.os-version }}.7z *
+
+      - name: zip-macos-x64
+        if: matrix.os-version == 'macos-13'
+        run: |
+          cd dist/Final2x-core
+          7z a -r Final2x-core-macos-x64.7z *
+
+      - name: zip-macos-arm64
+        if: matrix.os-version == 'macos-14'
+        run: |
+          cd dist/Final2x-core
+          7z a -r Final2x-core-macos-arm64.7z *
+
+      - name: upload
+        uses: actions/upload-artifact@v3
+        with:
+          name: Final2x-core-${{ matrix.os-version }}
+          path: dist/Final2x-core/*.7z
+
+      - name: Test build for windows
+        if: matrix.os-version == 'windows-latest'
+        run: |
+          cd dist\Final2x-core
+          .\Final2x-core
+
+      - name: Test build for unix
+        if: matrix.os-version != 'windows-latest'
+        run: |
+          cd dist/Final2x-core
+          ./Final2x-core

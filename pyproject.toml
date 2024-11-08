@@ -1,103 +1,76 @@
 [build-system]
-build-backend = "pdm.backend"
-requires = ["pdm-backend"]
+build-backend = "poetry-core.masonry.api"
+requires = ["poetry-core"]
 
-[project]
-authors = [
-  {name = "Tohrusky", email = "65994850+Tohrusky@users.noreply.github.com"}
+[tool.coverage.report]
+exclude_also = [
+  "raise AssertionError",
+  "raise NotImplementedError",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+  "except Exception as e"
 ]
+
+[tool.coverage.run]
+omit = [
+  "Final2x_core/__main__.py"
+]
+
+[tool.mypy]
+disable_error_code = "attr-defined"
+disallow_any_generics = false
+disallow_subclassing_any = false
+ignore_missing_imports = true
+plugins = ["pydantic.mypy"]
+strict = true
+warn_return_any = false
+
+[tool.poetry]
+authors = ["Tohrusky"]
 classifiers = [
-  "Programming Language :: Python :: 3.8",
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12"
 ]
-dependencies = [
-  "realcugan-ncnn-py>=2.0.0",
-  "realesrgan-ncnn-py>=2.0.0",
-  "waifu2x-ncnn-py>=2.0.0",
-  "PyYAML~=6.0",
-  "loguru~=0.7.0",
-  "requests~=2.26.0",
-  "tqdm~=4.62.0"
-]
-license = {text = "BSD-3-Clause"}
-name = "Final2x-core"
+description = "core library for Final2x"
+homepage = "https://github.com/Tohrusky/Final2x-core"
+license = "BSD-3-Clause"
+name = "Final2x_core"
 readme = "README.md"
-requires-python = ">=3.8, <3.13"
-version = "2.1.0"
+repository = "https://github.com/Tohrusky/Final2x-core"
+version = "3.0.0"
 
-[project.scripts]
-Final2x-core = "Final2x_core.__main__:main"
+# Requirements
+[tool.poetry.dependencies]
+PyYAML = "*"
+ccrestoration = "0.1.1"
+loguru = "*"
+pydantic = "*"
+python = "^3.9"
 
-[project.urls]
-Homepage = "https://github.com/Final2x/Final2x-core"
-Repository = "https://github.com/Final2x/Final2x-core"
+[tool.poetry.group.dev.dependencies]
+numpy = "*"
+pre-commit = "^3.7.0"
+pyinstaller = "^6.3.0"
+scikit-image = "*"
+torch = "*"
+torchvision = "*"
 
-[tool.coverage.run]
-omit = ["src"]
+[tool.poetry.group.test.dependencies]
+coverage = "^7.2.0"
+pytest = "^8.0"
+pytest-cov = "^4.0"
 
-[tool.mypy]
-disable_error_code = "attr-defined"
-disallow_any_generics = false
-ignore_missing_imports = true
-strict = true
-warn_return_any = false
+[tool.poetry.group.typing.dependencies]
+mypy = "^1.8.0"
+ruff = "^0.3.7"
 
-[tool.pdm.dev-dependencies]
-lint = [
-  "pre-commit",
-  "ruff",
-  "mypy"
-]
-test = [
-  "pytest",
-  "pytest-cov",
-  "scikit-image",
-  "types-PyYAML",
-  "types-requests",
-  "pyinstaller~=6.3"
-]
-
-[tool.pdm.scripts.download_models]
-call = "Final2x_core.download_models:download_all"
-help = "Download all models"
-
-[tool.pdm.scripts.generate_config]
-call = "scripts.gen_config:gen_config"
-help = "Generate config file"
-
-[tool.pdm.scripts.lint]
-composite = [
-  "mypy src tests",
-  "ruff check . --fix --exit-non-zero-on-fix",
-  "ruff format ."
-]
-help = "Check code style against linters"
-
-[tool.pdm.scripts.post_install]
-composite = [
-  "pre-commit install",
-  "generate_config",
-  "download_models"
-]
-help = "Install the pre-commit hook"
-
-[tool.pdm.scripts.post_pyinstaller]
-call = "scripts.post_pyinstaller:post_pyinstaller"
-help = "Copy models and config to the dist folder"
-
-[tool.pdm.scripts.pyinstaller]
-cmd = "pyinstaller -n Final2x-core -i assets/favicon.ico src/Final2x_core/__main__.py"
-help = "Build the executable with PyInstaller"
-
-[tool.pdm.scripts.test]
-cmd = "pytest tests --cov=src/Final2x_core/src --cov-report=xml --cov-report=html"
-help = "Run tests with coverage"
+[tool.poetry.scripts]
+Final2x-core = 'Final2x_core.__main__:main'
 
 [tool.ruff]
-extend-ignore = ["B018", "B019", "PGH003", "E721"]
+extend-ignore = ["B018", "B019", "RUF001", "PGH003", "PGH004", "RUF003", "E402", "RUF002", "B904"]
 extend-select = [
   "I",  # isort
   "B",  # flake8-bugbear
@@ -118,7 +91,6 @@ skip-magic-trailing-comma = false
 
 [tool.ruff.isort]
 combine-as-imports = true
-known-first-party = ["pdm"]
 
 [tool.ruff.mccabe]
 max-complexity = 10

@@ -19,13 +19,13 @@ env:
   GITHUB_ACTIONS: true
 
 jobs:
-  pip-test:
+  build-wheel:
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
-        os-version: ["windows-latest", "ubuntu-20.04", "macos-13", "macos-14"]
+        python-version: ["3.11"]
+        poetry-version: ["1.8.3"]
 
-    runs-on: ${{ matrix.os-version }}
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
         with:
@@ -34,17 +34,58 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-          architecture: x64
-        continue-on-error: true
 
-      - name: vulkan dll
-        if: matrix.os-version == 'windows-latest'
-        run: echo F | xcopy .\assets\vulkan-1.dll C:\Windows\System32
+      - uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: ${{ matrix.poetry-version }}
+
+      - name: Build package
+        run: |
+          make build
+
+      - name: upload
+        uses: actions/upload-artifact@v3
+        with:
+          name: wheel
+          path: dist/*.whl
+
+  pip-test:
+    needs: [build-wheel]
+    strategy:
+      matrix:
+        os-version: ["ubuntu-20.04", "macos-13", "macos-14"]
+        python-version: ["3.11"]
+
+    runs-on: ${{ matrix.os-version }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: wheel
+          path: dist
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install Final2x-core
+          pip install numpy==1.26.4
+          cd dist
+          pip install *.whl
+
+      - name: Install PyTorch 2.2.2 with CUDA
+        if: matrix.os-version == 'windows-latest'
+        run: |
+          pip install torch==2.2.2 torchvision==0.17.2 torchaudio==2.2.2 --index-url https://download.pytorch.org/whl/cu121
+
+      - name: Install PyTorch 2.2.2
+        if: matrix.os-version != 'windows-latest'
+        run: |
+          pip install torch==2.2.2 torchvision==0.17.2 torchaudio==2.2.2
 
       - name: Test pip
         run: |

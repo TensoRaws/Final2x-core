@@ -2,29 +2,29 @@ import os
 from pathlib import Path
 
 import yaml
+from ccrestoration import ConfigType
 
 projectPATH = Path(__file__).resolve().parent.parent.absolute()
 
-_GPUID_ = 0
-# gpuid = -1 when in GitHub Actions
 if os.environ.get("GITHUB_ACTIONS") == "true":
-    _GPUID_ = -1
+    _DEVICE_ = "cpu"
+else:
+    _DEVICE_ = "auto"
 
 print("-" * 50)
 
 
 def gen_config() -> None:
-    gpuid = _GPUID_
-
-    if gpuid == -1:
+    if _DEVICE_ == "cpu":
         print("GitHub Actions detected. Using CPU.")
-    else:
-        print(f"Not in GitHub Actions. Using GPU {gpuid}.")
 
     p_dict = {
-        "gpuid": gpuid,
-        "inputpath": [
-            "./1/1/4/5/1/4/1/9/1/9/8/1/0.jpg",
+        "pretrained_model_name": ConfigType.RealESRGAN_AnimeJaNai_HD_V3_Compact_2x.value,
+        "device": _DEVICE_,
+        "gh_proxy": None,
+        "target_scale": None,
+        "output_path": str(projectPATH / "assets"),
+        "input_path": [
             str(projectPATH / "assets" / "gray.jpg"),
             str(projectPATH / "assets" / "herta.jpg"),
             str(projectPATH / "assets" / "final2x-10.png"),
@@ -37,15 +37,9 @@ def gen_config() -> None:
             str(projectPATH / "assets" / "herta-unix-pic.exe"),
             str(projectPATH / "assets" / "vulkan-1.dll"),
         ],
-        "model": "RealCUGAN-pro",
-        "modelscale": 2,
-        "modelnoise": 1,
-        "outputpath": str(projectPATH / "assets"),
-        "targetscale": 2,
-        "tta": False,
     }
 
-    p_yaml = str(projectPATH / "src/Final2x_core/config.yaml")
+    p_yaml = str(projectPATH / "Final2x_core/config.yaml")
 
     with open(p_yaml, "w", encoding="utf-8") as f:
         yaml.safe_dump(p_dict, f)

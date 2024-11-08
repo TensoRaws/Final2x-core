@@ -1,9 +1,4 @@
 repos:
-  - repo: https://github.com/pdm-project/pdm
-    rev: 2.11.1 # a PDM release exposing the hook
-    hooks:
-      - id: pdm-sync
-
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0
     hooks:
@@ -35,14 +30,15 @@ repos:
         args: [--fix, --exit-non-zero-on-fix]
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.8.0
+    rev: v1.7.1
     hooks:
       - id: mypy
-        args: [src, tests]
+        args: [Final2x_core, tests]
         pass_filenames: false
         additional_dependencies:
-          - loguru
-          - types-PyYAML
           - types-requests
           - types-certifi
+          - types-PyYAML
           - pytest
+          - pydantic
+          - tenacity

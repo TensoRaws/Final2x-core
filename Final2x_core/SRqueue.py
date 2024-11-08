@@ -1,41 +1,45 @@
 from pathlib import Path
+from typing import List
 
 import cv2
 import numpy as np
-from Final2x_core.src.SRFactory import SRFactory
-from Final2x_core.src.utils.getConfig import SRCONFIG
-from Final2x_core.src.utils.progressLog import PrintProgressLog
 from loguru import logger
 
+from Final2x_core.config import SRConfig
+from Final2x_core.SRclass import CCRestoration
+from Final2x_core.util import PrintProgressLog
 
-def SR_queue() -> None:
+
+def sr_queue(config: SRConfig) -> None:
     """
     Super-resolution queue. Process all RGBA images according to the config.
+
+    :param config: SRConfig
     :return:
     """
-    config = SRCONFIG()
-    input_path: list = config.inputpath
-    output_path: Path = Path(config.outputpath) / "outputs"
+    input_path: List[Path] = config.input_path
+    output_path: Path = config.output_path / "outputs"
     output_path.mkdir(parents=True, exist_ok=True)  # create output folder
-    sr = SRFactory.getSR()
+    sr = CCRestoration(config)
 
     logger.info("Processing------[ 0.0% ]")
 
     for img_path in input_path:
-        save_path = str(output_path / (Path(str(config.targetscale) + "x-" + Path(img_path).name).stem + ".png"))
+        save_path = str(output_path / (Path(str(config.target_scale) + "x-" + Path(img_path).name).stem + ".png"))
 
         i: int = 0
         while Path(save_path).is_file():
             logger.warning("Image already exists: " + save_path)
             i += 1
             save_path = str(
-                output_path / (Path(str(config.targetscale) + "x-" + Path(img_path).name).stem + "(" + str(i) + ").png")
+                output_path
+                / (Path(str(config.target_scale) + "x-" + Path(img_path).name).stem + "(" + str(i) + ").png")
             )
             logger.warning("Try to save to: " + save_path)
 
         if not Path(img_path).is_file():
-            logger.error("File not found: " + img_path + ", skip. Save path: " + save_path)
-            logger.warning("______Skip_Image______: " + img_path)
+            logger.error("File not found: " + str(img_path) + ", skip. Save path: " + save_path)
+            logger.warning("______Skip_Image______: " + str(img_path))
             PrintProgressLog().skipProgress()
 
         else:
@@ -62,12 +66,12 @@ def SR_queue() -> None:
                     raise Exception("Failed to decode image.")
             except Exception as e:
                 logger.error(str(e))
-                logger.warning("CV2 load image failed: " + img_path + ", skip. ")
-                logger.warning("______Skip_Image______: " + img_path)
+                logger.warning("CV2 load image failed: " + str(img_path) + ", skip. ")
+                logger.warning("______Skip_Image______: " + str(img_path))
                 PrintProgressLog().skipProgress()
                 continue
 
-            logger.info("Processing: " + img_path + ", save to: " + save_path)
+            logger.info("Processing: " + str(img_path) + ", save to: " + save_path)
             img = sr.process(img)
 
             if alpha_channel is not None:
@@ -80,4 +84,4 @@ def SR_queue() -> None:
 
             cv2.imencode(".png", img)[1].tofile(save_path)
 
-            logger.success("______Process_Completed______: " + img_path)
+            logger.success("______Process_Completed______: " + str(img_path))
