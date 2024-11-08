@@ -123,10 +123,10 @@ jobs:
           name: wheel
           path: dist
 
-  #      - name: Publish a Python distribution to PyPI
-  #        uses: pypa/gh-action-pypi-publish@release/v1
-  #        with:
-  #          password: ${{ secrets.PYPI_API }}
+      - name: Publish a Python distribution to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.PYPI_API }}
 
   github:
     needs: [setup, build, pypi]
