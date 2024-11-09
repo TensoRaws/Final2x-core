@@ -61,6 +61,7 @@ jobs:
       - name: Test
         run: |
           make gen
+          make gen-ts
           make lint
           make test
 

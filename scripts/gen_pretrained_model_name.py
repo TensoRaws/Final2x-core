@@ -34,6 +34,7 @@ def gen_ts() -> None:
         ModelType.EDSR,
         ModelType.SwinIR,
         ModelType.SCUNet,
+        ModelType.DAT,
     ]
 
     for cfg in ConfigType:
