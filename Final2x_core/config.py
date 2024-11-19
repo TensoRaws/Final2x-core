@@ -60,7 +60,7 @@ class SRConfig(BaseModel):
 
     @field_validator("device")
     def device_match(cls, v: str) -> str:
-        device_list = ["auto", "cpu", "cuda", "mps", "xpu", "xla", "meta"]
+        device_list = ["auto", "cpu", "cuda", "mps", "directml"]
         for d in device_list:
             if v.startswith(d):
                 return v

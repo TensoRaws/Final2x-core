@@ -1,5 +1,4 @@
 import math
-from typing import Any
 
 import cv2
 import numpy as np
@@ -7,7 +6,7 @@ from ccrestoration import AutoModel, SRBaseModel
 from loguru import logger
 
 from Final2x_core.config import SRConfig
-from Final2x_core.util import PrintProgressLog
+from Final2x_core.util import PrintProgressLog, get_device
 
 
 class CCRestoration:
@@ -22,26 +21,14 @@ class CCRestoration:
 
         PrintProgressLog().set(len(self.config.input_path), 1)
 
-        self._SR_class: SRBaseModel = self._init_SR_model()
-
-        logger.info("SR Class init, device: " + str(self._SR_class.device))
-
-    def _init_SR_model(self) -> Any:
-        """
-        init sr model from ccrestoration
-        :return:
-        """
-        if self.config.device == "auto":
-            _device = None
-        else:
-            _device = self.config.device
-
-        return AutoModel.from_pretrained(
+        self._SR_class: SRBaseModel = AutoModel.from_pretrained(
             pretrained_model_name=self.config.pretrained_model_name,
             fp16=False,
-            device=_device,
+            device=get_device(self.config.device),
             gh_proxy=self.config.gh_proxy,
         )
+
+        logger.info("SR Class init, device: " + str(self._SR_class.device))
 
     @logger.catch  # type: ignore
     def process(self, img: np.ndarray) -> np.ndarray:
