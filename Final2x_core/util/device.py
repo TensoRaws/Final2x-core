@@ -22,6 +22,8 @@ def get_device(device: str) -> Union[torch.device, str]:
         import torch_directml
 
         return torch_directml.device()
+    elif device.startswith("xpu"):
+        return torch.device("xpu")
     else:
         print(f"Unknown device: {device}, use auto instead.")
         return default_device()
