@@ -19,21 +19,21 @@ jobs:
   build:
     strategy:
       matrix:
-        os-version: ["windows-latest", "macos-13", "macos-14"]
+        os-version: ["windows-latest", "macos-14"]
         python-version: ["3.11"]
         poetry-version: ["1.8.3"]
 
     runs-on: ${{ matrix.os-version }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
 
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
 
-      - uses: abatilo/actions-poetry@v2
+      - uses: abatilo/actions-poetry@v3
         with:
           poetry-version: ${{ matrix.poetry-version }}
 
@@ -68,12 +68,6 @@ jobs:
           cd dist\Final2x-core
           7z a -r Final2x-core-${{ matrix.os-version }}.7z *
 
-      - name: zip-macos-x64
-        if: matrix.os-version == 'macos-13'
-        run: |
-          cd dist/Final2x-core
-          7z a -r Final2x-core-macos-x64.7z *
-
       - name: zip-macos-arm64
         if: matrix.os-version == 'macos-14'
         run: |
@@ -81,7 +75,7 @@ jobs:
           7z a -r Final2x-core-macos-arm64.7z *
 
       - name: upload
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           path: dist/Final2x-core/*.7z
 
@@ -93,15 +87,15 @@ jobs:
 
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
 
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
 
-      - uses: abatilo/actions-poetry@v2
+      - uses: abatilo/actions-poetry@v3
         with:
           poetry-version: ${{ matrix.poetry-version }}
 
@@ -110,7 +104,7 @@ jobs:
           make build
 
       - name: upload
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: wheel
           path: dist/*.whl
@@ -119,7 +113,7 @@ jobs:
     needs: [build-wheel]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: wheel
           path: dist
@@ -133,7 +127,7 @@ jobs:
     needs: [setup, build, pypi]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           path: asset
 

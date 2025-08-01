@@ -62,12 +62,6 @@ After v3.0.0, ncnn will be deprecated, and the project will use ccrestoration(Py
 ---
 
 - [ncnn](https://github.com/Tencent/ncnn)
-- [nihui/realcugan-ncnn-vulkan](https://github.com/nihui/realcugan-ncnn-vulkan)
-- [xinntao/Real-ESRGAN-ncnn-vulkan](https://github.com/xinntao/Real-ESRGAN-ncnn-vulkan)
-- [nihui/waifu2x-ncnn-vulkan](https://github.com/nihui/waifu2x-ncnn-vulkan)
-- [realcugan-ncnn-py](https://github.com/Tohrusky/realcugan-ncnn-py)
-- [realesrgan-ncnn-py](https://github.com/Tohrusky/realesrgan-ncnn-py)
-- [waifu2x-ncnn-py](https://github.com/Tohrusky/waifu2x-ncnn-py)
 
 ### License
 

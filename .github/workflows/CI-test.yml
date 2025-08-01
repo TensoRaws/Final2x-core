@@ -22,21 +22,21 @@ jobs:
   CI:
     strategy:
       matrix:
-        os-version: ["windows-latest", "ubuntu-20.04", "macos-13", "macos-14"]
+        os-version: ["windows-latest", "ubuntu-latest", "macos-14"]
         python-version: ["3.11"]
         poetry-version: ["1.8.3"]
 
     runs-on: ${{ matrix.os-version }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
 
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
 
-      - uses: abatilo/actions-poetry@v2
+      - uses: abatilo/actions-poetry@v3
         with:
           poetry-version: ${{ matrix.poetry-version }}
 
@@ -67,7 +67,7 @@ jobs:
 
       - name: Codecov
         if: matrix.os-version == 'ubuntu-20.04'
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
@@ -84,16 +84,10 @@ jobs:
           7z a -r Final2x-core-${{ matrix.os-version }}.7z *
 
       - name: zip-ubuntu
-        if: matrix.os-version == 'ubuntu-20.04'
+        if: matrix.os-version == 'ubuntu-latest'
         run: |
           cd dist/Final2x-core
           7z a -r Final2x-core-${{ matrix.os-version }}.7z *
-
-      - name: zip-macos-x64
-        if: matrix.os-version == 'macos-13'
-        run: |
-          cd dist/Final2x-core
-          7z a -r Final2x-core-macos-x64.7z *
 
       - name: zip-macos-arm64
         if: matrix.os-version == 'macos-14'
@@ -102,7 +96,7 @@ jobs:
           7z a -r Final2x-core-macos-arm64.7z *
 
       - name: upload
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Final2x-core-${{ matrix.os-version }}
           path: dist/Final2x-core/*.7z
