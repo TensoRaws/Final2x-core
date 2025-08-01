@@ -50,7 +50,6 @@ pydantic = "*"
 python = "^3.9"
 
 [tool.poetry.group.dev.dependencies]
-numpy = "*"
 pre-commit = "^3.7.0"
 pyinstaller = "^6.3.0"
 scikit-image = "*"
