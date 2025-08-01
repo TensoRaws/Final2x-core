@@ -79,15 +79,15 @@ jobs:
           cd dist
           pip install *.whl
 
-      - name: Install PyTorch 2.2.2 with CUDA
+      - name: Install PyTorch on Windows
         if: matrix.os-version == 'windows-latest'
         run: |
-          pip install torch==2.2.2 torchvision==0.17.2 torchaudio==2.2.2 --index-url https://download.pytorch.org/whl/cu121
+          torch==2.7.1 torchvision==0.22.1 torchaudio==2.7.1 --index-url https://download.pytorch.org/whl/cu128
 
-      - name: Install PyTorch 2.2.2
+      - name: Install PyTorch on non-Windows
         if: matrix.os-version != 'windows-latest'
         run: |
-          pip install torch==2.2.2 torchvision==0.17.2 torchaudio==2.2.2
+          torch==2.7.1 torchvision==0.22.1 torchaudio==2.7.1
 
       - name: Test pip
         run: |
