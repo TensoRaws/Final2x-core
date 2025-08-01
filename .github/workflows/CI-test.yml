@@ -19,7 +19,7 @@ env:
   GITHUB_ACTIONS: true
 
 jobs:
-  CI:
+  pytest:
     strategy:
       matrix:
         os-version: ["windows-latest", "ubuntu-latest", "macos-14"]
@@ -55,12 +55,12 @@ jobs:
       - name: Install PyTorch on Windows
         if: matrix.os-version == 'windows-latest'
         run: |
-          pip install torch==2.7.1 torchvision==0.22.1 torchaudio==2.7.1 --index-url https://download.pytorch.org/whl/cu128
+          pip install torch==2.7.1 torchvision==0.22.1 --index-url https://download.pytorch.org/whl/cu128
 
       - name: Install PyTorch on non-Windows
         if: matrix.os-version != 'windows-latest'
         run: |
-          pip install torch==2.7.1 torchvision==0.22.1 torchaudio==2.7.1
+          pip install torch==2.7.1 torchvision==0.22.1
 
       - name: Test
         run: |
@@ -74,6 +74,46 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+
+  pyinstaller:
+    strategy:
+      matrix:
+        os-version: ["windows-latest", "ubuntu-latest", "macos-14"]
+        python-version: ["3.11"]
+        poetry-version: ["1.8.3"]
+
+    runs-on: ${{ matrix.os-version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - uses: abatilo/actions-poetry@v3
+        with:
+          poetry-version: ${{ matrix.poetry-version }}
+
+      - name: Install dependencies
+        run: |
+          pip install numpy==1.26.4
+          pip install opencv-python==4.10.0.84
+
+          pip install ccrestoration
+
+          pip install PyYAML pydantic loguru
+
+      - name: Install PyTorch on Windows
+        if: matrix.os-version == 'windows-latest'
+        run: |
+          pip install torch==2.7.1 torchvision==0.22.1 --index-url https://download.pytorch.org/whl/cu128
+
+      - name: Install PyTorch on non-Windows
+        if: matrix.os-version != 'windows-latest'
+        run: |
+          pip install torch==2.7.1 torchvision==0.22.1
 
       - name: Build
         run: |
