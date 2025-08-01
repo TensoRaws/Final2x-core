@@ -43,6 +43,8 @@ jobs:
       - name: Install dependencies
         run: |
           pip install numpy==1.26.4
+          pip install opencv-python-headless==4.10.0.84
+
           pip install PyYAML pydantic ccrestoration loguru
           pip install pre-commit scikit-image
           pip install pytest pytest-cov coverage

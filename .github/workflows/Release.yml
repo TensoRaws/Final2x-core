@@ -40,6 +40,8 @@ jobs:
       - name: Install dependencies
         run: |
           pip install numpy==1.26.4
+          pip install opencv-python-headless==4.10.0.84
+
           pip install PyYAML pydantic ccrestoration loguru
           pip install pre-commit scikit-image
           pip install pytest pytest-cov coverage
@@ -79,7 +81,7 @@ jobs:
         with:
           path: dist/Final2x-core/*.7z
 
-  build-wheel:
+  pypi:
     strategy:
       matrix:
         python-version: ["3.11"]
@@ -102,21 +104,6 @@ jobs:
       - name: Build package
         run: |
           make build
-
-      - name: upload
-        uses: actions/upload-artifact@v4
-        with:
-          name: wheel
-          path: dist/*.whl
-
-  pypi:
-    needs: [build-wheel]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: wheel
-          path: dist
 
       - name: Publish a Python distribution to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
