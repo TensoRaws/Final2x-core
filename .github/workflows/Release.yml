@@ -89,7 +89,7 @@ jobs:
         python-version: ["3.11"]
         poetry-version: ["1.8.3"]
 
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
