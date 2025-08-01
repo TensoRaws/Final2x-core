@@ -61,7 +61,7 @@ jobs:
 
       - name: Build
         run: |
-          pip install pyinstaller~=6.3.0
+          pip install pyinstaller~=6.14.2
           make gen
           make gen-ts
           make pyinstaller
