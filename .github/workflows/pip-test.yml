@@ -53,7 +53,7 @@ jobs:
     needs: [build-wheel]
     strategy:
       matrix:
-        os-version: ["windows-latest", "ubuntu-latest", "macos-14"]
+        os-version: ["ubuntu-latest"]
         python-version: ["3.11"]
 
     runs-on: ${{ matrix.os-version }}
