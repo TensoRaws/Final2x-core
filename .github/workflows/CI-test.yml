@@ -162,10 +162,10 @@ jobs:
           name: Final2x-core-${{ matrix.os-version }}
           path: dist
 
-      - name: unzip build
+      - name: unzip build # -oXXX is used to specify the output directory, no space after -o
         run: |
           cd dist
-          7z x Final2x-core-${{ matrix.os-version }}.7z -o Final2x-core
+          7z x Final2x-core-${{ matrix.os-version }}.7z -oFinal2x-core
 
       - name: Test build for windows
         if: matrix.os-version == 'windows-latest'
