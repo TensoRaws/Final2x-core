@@ -75,7 +75,7 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
-  pyinstaller:
+  build:
     strategy:
       matrix:
         os-version: ["windows-latest", "ubuntu-latest", "macos-14"]
@@ -144,6 +144,28 @@ jobs:
         with:
           name: Final2x-core-${{ matrix.os-version }}
           path: dist/Final2x-core/*.7z
+
+  test-build:
+    needs: [build]
+    strategy:
+      matrix:
+        os-version: ["windows-latest", "ubuntu-latest", "macos-14"]
+
+    runs-on: ${{ matrix.os-version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: Final2x-core-${{ matrix.os-version }}
+          path: dist
+
+      - name: unzip build
+        run: |
+          cd dist
+          7z x Final2x-core-${{ matrix.os-version }}.7z -o Final2x-core
 
       - name: Test build for windows
         if: matrix.os-version == 'windows-latest'
