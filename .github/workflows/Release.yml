@@ -67,7 +67,7 @@ jobs:
         if: matrix.os-version == 'windows-latest'
         run: |
           cd dist\Final2x-core
-          7z a -r Final2x-core-${{ matrix.os-version }}.7z *
+          7z a -r Final2x-core-windows-x64.7z *
 
       - name: zip-macos-arm64
         if: matrix.os-version == 'macos-14'

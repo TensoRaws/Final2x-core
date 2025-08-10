@@ -121,23 +121,17 @@ jobs:
           make gen
           make pyinstaller
 
-      - name: zip-windows
+      - name: zip on windows
         if: matrix.os-version == 'windows-latest'
         run: |
           cd dist\Final2x-core
           7z a -r Final2x-core-${{ matrix.os-version }}.7z *
 
-      - name: zip-ubuntu
+      - name: zip on non-windows
         if: matrix.os-version == 'ubuntu-latest'
         run: |
           cd dist/Final2x-core
           7z a -r Final2x-core-${{ matrix.os-version }}.7z *
-
-      - name: zip-macos-arm64
-        if: matrix.os-version == 'macos-14'
-        run: |
-          cd dist/Final2x-core
-          7z a -r Final2x-core-macos-arm64.7z *
 
       - name: upload
         uses: actions/upload-artifact@v4
