@@ -87,7 +87,14 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          path: dist
+          path: asset
+
+      - name: Flatten asset directory
+        run: |
+          tree asset
+          mkdir dist
+          find asset -type f -print0 | xargs -0 -I{} cp "{}" dist/
+          cd dist && ls -l
 
       - name: Create Release and Upload Release Asset
         uses: softprops/action-gh-release@v2
