@@ -81,6 +81,7 @@ jobs:
           path: dist/Final2x-core/*.7z
 
   pypi:
+    needs: [build]
     strategy:
       matrix:
         python-version: ["3.11"]
@@ -110,7 +111,7 @@ jobs:
           password: ${{ secrets.PYPI_API }}
 
   github:
-    needs: [setup, build, pypi]
+    needs: [setup, build]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
