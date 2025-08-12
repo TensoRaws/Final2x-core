@@ -87,14 +87,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          path: asset
-
-      - name: dist
-        run: |
-          mkdir dist
-          tree asset
-          cp asset/artifact/* dist
-          cd dist && ls
+          path: dist
 
       - name: Create Release and Upload Release Asset
         uses: softprops/action-gh-release@v2
