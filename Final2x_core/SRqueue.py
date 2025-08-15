@@ -25,6 +25,9 @@ def sr_queue(config: SRConfig) -> None:
     logger.info("Processing------[ 0.0% ]")
 
     save_format = ".png" if config.save_format is None else config.save_format
+    if not save_format.startswith("."):
+        logger.warning(f"save_format '{save_format}' does not start with a '.', prepending it.")
+        save_format = "." + save_format
 
     for img_path in input_path:
         base_stem = Path(f"{config.target_scale}x-{Path(img_path).name}").stem
