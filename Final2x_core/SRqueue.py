@@ -30,7 +30,7 @@ def sr_queue(config: SRConfig) -> None:
         save_format = "." + save_format
 
     for img_path in input_path:
-        base_stem = Path(f"{config.target_scale}x-{Path(img_path).name}").stem
+        base_stem = f"{config.target_scale}x-{Path(img_path).stem}"
         save_path = str(output_path / (base_stem + save_format))
         i: int = 0
         while Path(save_path).is_file():
