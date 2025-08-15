@@ -7,6 +7,6 @@ class Test_SAVE_FORMAT:
     def test_case_save_format(self) -> None:
         config: SRConfig = SRConfig.from_yaml(CONFIG_PATH)
         config.target_scale = 4
-        for format in [".png", ".jpg", ".webp", ".tiff"]:
-            config.save_format = format
+        for _format in [".png", ".jpg", ".webp", ".tiff"]:
+            config.save_format = _format
             sr_queue(config=config)
