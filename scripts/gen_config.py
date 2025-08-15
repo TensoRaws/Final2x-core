@@ -38,6 +38,7 @@ def gen_config() -> None:
             str(projectPATH / "assets" / "herta-unix-pic.exe"),
             str(projectPATH / "assets" / "vulkan-1.dll"),
         ],
+        "save_format": ".png",
     }
 
     p_yaml = str(projectPATH / "Final2x_core/config.yaml")

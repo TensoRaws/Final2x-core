@@ -16,6 +16,7 @@ class SRConfig(BaseModel):
     target_scale: Optional[Union[int, float]] = None
     output_path: DirectoryPath
     input_path: List[FilePath]
+    save_format: Optional[str] = ".png"
     cc_model_scale: Optional[int] = None
 
     @classmethod

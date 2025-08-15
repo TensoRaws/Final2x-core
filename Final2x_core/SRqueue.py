@@ -24,8 +24,10 @@ def sr_queue(config: SRConfig) -> None:
 
     logger.info("Processing------[ 0.0% ]")
 
+    save_format = ".png" if config.save_format is None else config.save_format
+
     for img_path in input_path:
-        save_path = str(output_path / (Path(str(config.target_scale) + "x-" + Path(img_path).name).stem + ".png"))
+        save_path = str(output_path / (Path(str(config.target_scale) + "x-" + Path(img_path).name).stem + save_format))
 
         i: int = 0
         while Path(save_path).is_file():
@@ -33,7 +35,7 @@ def sr_queue(config: SRConfig) -> None:
             i += 1
             save_path = str(
                 output_path
-                / (Path(str(config.target_scale) + "x-" + Path(img_path).name).stem + "(" + str(i) + ").png")
+                / (Path(str(config.target_scale) + "x-" + Path(img_path).name).stem + "(" + str(i) + ")" + save_format)
             )
             logger.warning("Try to save to: " + save_path)
 
@@ -82,6 +84,6 @@ def sr_queue(config: SRConfig) -> None:
                 # Merge processed RGB channels with processed alpha tensor
                 img = np.dstack((img, alpha_tensor[:, :, 0]))
 
-            cv2.imencode(".png", img)[1].tofile(save_path)
+            cv2.imencode(save_format, img)[1].tofile(save_path)
 
             logger.success("______Process_Completed______: " + str(img_path))
