@@ -19,9 +19,7 @@ class CCRestoration:
     def __init__(self, config: SRConfig) -> None:
         self.config: SRConfig = config
 
-        tile = None
-        if self.config.use_tile is not None and self.config.use_tile:
-            tile = (128, 128)
+        tile = (128, 128) if self.config.use_tile else None
 
         PrintProgressLog().set(len(self.config.input_path), 1)
 
