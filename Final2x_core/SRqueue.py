@@ -27,16 +27,13 @@ def sr_queue(config: SRConfig) -> None:
     save_format = ".png" if config.save_format is None else config.save_format
 
     for img_path in input_path:
-        save_path = str(output_path / (Path(str(config.target_scale) + "x-" + Path(img_path).name).stem + save_format))
-
+        base_stem = Path(f"{config.target_scale}x-{Path(img_path).name}").stem
+        save_path = str(output_path / (base_stem + save_format))
         i: int = 0
         while Path(save_path).is_file():
             logger.warning("Image already exists: " + save_path)
             i += 1
-            save_path = str(
-                output_path
-                / (Path(str(config.target_scale) + "x-" + Path(img_path).name).stem + "(" + str(i) + ")" + save_format)
-            )
+            save_path = str(output_path / (base_stem + "(" + str(i) + ")" + save_format))
             logger.warning("Try to save to: " + save_path)
 
         if not Path(img_path).is_file():
