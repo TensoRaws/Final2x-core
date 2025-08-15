@@ -11,6 +11,7 @@ from pydantic import BaseModel, DirectoryPath, FilePath, field_validator
 class SRConfig(BaseModel):
     pretrained_model_name: Union[ConfigType, str]
     device: str
+    use_tile: Optional[bool] = None
     gh_proxy: Optional[str] = None
     target_scale: Optional[Union[int, float]] = None
     output_path: DirectoryPath

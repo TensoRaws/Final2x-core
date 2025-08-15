@@ -10,6 +10,8 @@ def get_device(device: str) -> Union[torch.device, str]:
 
     :param device: device string
     """
+    device = device.lower()
+
     if device.startswith("auto"):
         return default_device()
     elif device.startswith("cpu"):
